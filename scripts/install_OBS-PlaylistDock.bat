@@ -23,11 +23,11 @@ try {
     if (-not (Test-Path -LiteralPath $obsExe) -or -not (Test-Path -LiteralPath $qtDll)) {
         throw '找不到 OBS。可将 OBS 安装目录作为本 BAT 的第一个参数。'
     }
-    if ((Get-Item -LiteralPath $obsExe).VersionInfo.FileVersion -notmatch '^32\.0\.4(?:\D|$)') {
-        throw '本插件需要 OBS Studio 32.0.4。'
+    if ((Get-Item -LiteralPath $obsExe).VersionInfo.FileVersion -notmatch '^32\.') {
+        throw '本插件需要 OBS Studio 32.x。'
     }
-    if ((Get-Item -LiteralPath $qtDll).VersionInfo.FileVersion -notmatch '^6\.8\.3(?:\D|$)') {
-        throw '本插件需要 OBS 随附的 Qt 6.8.3。'
+    if ((Get-Item -LiteralPath $qtDll).VersionInfo.FileVersion -notmatch '^6\.11\.') {
+        throw '本插件需要 OBS 随附的 Qt 6.11（OBS 32.2.x）。'
     }
     $source = Join-Path $packageRoot 'obs-playlistdock'
     if (-not (Test-Path -LiteralPath (Join-Path $source 'bin\64bit\OBS-PlaylistDock.dll'))) {

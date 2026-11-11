@@ -25,7 +25,7 @@ for ($run = 1; $run -le $Runs; $run++) {
     $latestLog = Get-ChildItem -LiteralPath (Join-Path $Destination 'config\obs-studio\logs') -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     $text = Get-Content -LiteralPath $latestLog.FullName -Raw
     if ($process.ExitCode -ne 0) { throw "Smoke run $run exited with $($process.ExitCode)." }
-    if (-not $Baseline -and $text -notmatch '\[OBS-PlaylistDock\].*loaded; Qt 6.8.3; dock registered\.') {
+    if (-not $Baseline -and $text -notmatch '\[OBS-PlaylistDock\].*loaded; Qt [\d.]+; dock registered\.') {
         throw "Plugin did not load: $($latestLog.FullName)"
     }
     if ($env:PLAYLISTDOCK_SMOKE_MEDIA -and $text -notmatch 'OBS_UI_CHECK all=PASS') {
