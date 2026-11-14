@@ -5,9 +5,15 @@
 #include <QPointer>
 #include <QSet>
 
-#if LIBOBS_API_MAJOR_VER != 32
-#error Build OBS-PlaylistDock against OBS 32.x headers.
+// Built against OBS 32.x headers; the libobs/frontend ABI used here is unchanged in OBS 33.
+#if LIBOBS_API_MAJOR_VER < 32 || LIBOBS_API_MAJOR_VER > 33
+#error Build OBS-PlaylistDock against OBS 32.x or 33.x headers.
 #endif
+
+namespace {
+constexpr uint32_t MinObsMajor = 32;
+constexpr uint32_t MaxObsMajor = 33;
+}
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-playlistdock", "en-US")
@@ -100,8 +106,9 @@ void frontendEvent(obs_frontend_event event, void *)
 
 bool obs_module_load()
 {
-    if ((obs_get_version() >> 24) != 32) {
-        blog(LOG_ERROR, "[OBS-PlaylistDock] This build requires OBS 32.x.");
+    const uint32_t obsMajor = obs_get_version() >> 24;
+    if (obsMajor < MinObsMajor || obsMajor > MaxObsMajor) {
+        blog(LOG_ERROR, "[OBS-PlaylistDock] This build requires OBS 32.x or 33.x; running %s.", obs_get_version_string());
         return false;
     }
     if (!QString::fromLatin1(qVersion()).startsWith(QStringLiteral("%1.%2.").arg(QT_VERSION_MAJOR).arg(QT_VERSION_MINOR))) {

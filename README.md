@@ -19,6 +19,6 @@ A compact VLC playlist dock for OBS Studio. Supports Windows x64 and macOS ARM64
 
 [Download](https://github.com/iesv/OBS-PlaylistDock/releases/latest) the ZIP for your platform. Close OBS, extract it and run `install_OBS-PlaylistDock.bat` on Windows, or `bash install_OBS-PlaylistDock.sh` on macOS. The macOS installer removes the plugin quarantine attribute.
 
-Requires OBS Studio 32.x and VLC. The plugin loads on any OBS 32.x release whose Qt matches the Qt it was built against; release builds target OBS 32.2.x (Qt 6.11).
+Requires OBS Studio 32.x or 33.x and VLC. The plugin loads on any OBS 32.x or 33.x release whose Qt matches the Qt it was built against; release builds target OBS 32.2.x and 33.x (Qt 6.11).
 
 Author: [haliluya.net](https://haliluya.net). [GPL-2.0-or-later](LICENSE).

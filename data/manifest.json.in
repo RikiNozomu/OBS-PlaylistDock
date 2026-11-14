@@ -4,6 +4,6 @@
   "display_name": "OBS-PlaylistDock",
   "version": "@PROJECT_VERSION@",
   "os_arch": "@PLAYLISTDOCK_PLATFORM@",
-  "description": "Lightweight VLC playlist dock for OBS Studio 32.x",
+  "description": "Lightweight VLC playlist dock for OBS Studio 32.x and 33.x",
   "urls": {"website": "https://github.com/iesv/OBS-PlaylistDock"}
 }
