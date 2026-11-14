@@ -10,6 +10,7 @@ $env:PATH = (Join-Path $ObsRoot 'bin\64bit') + ';' + (Join-Path $Qt 'bin') + ';'
 $env:QT_QPA_PLATFORM = 'minimal'
 $env:QT_QPA_PLATFORM_PLUGIN_PATH = Join-Path $Qt 'plugins\platforms'
 $env:PLAYLISTDOCK_OBS_DATA = Join-Path $ObsRoot 'data\libobs'
+$env:PLAYLISTDOCK_GRAPHICS_MODULE = Join-Path $ObsRoot 'bin\64bit\libobs-d3d11.dll'
 & $executable --fake
 if ($LASTEXITCODE -ne 0) { throw 'State/lifecycle stress tests failed.' }
 if ($Media -and $Media.Count -gt 0) {

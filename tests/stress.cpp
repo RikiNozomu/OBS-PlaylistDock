@@ -1578,13 +1578,10 @@ int main(int argc, char **argv)
     obs_add_data_path(dataPrefix.constData());
 #endif
     obs_video_info video{};
-#ifdef _WIN32
-    video.graphics_module = "libobs-d3d11";
-#else
+    // OBS 32.2+ loads bare module names without searching PATH, so pass a full path.
     const QByteArray graphics = qgetenv("PLAYLISTDOCK_GRAPHICS_MODULE");
     check(!graphics.isEmpty(), "PLAYLISTDOCK_GRAPHICS_MODULE must point to the OBS graphics library");
     video.graphics_module = graphics.constData();
-#endif
     video.fps_num = 30;
     video.fps_den = 1;
     video.base_width = 128;

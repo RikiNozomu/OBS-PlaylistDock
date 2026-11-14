@@ -1,4 +1,9 @@
-"""Prepare OBS 32.0.4 and its matching Qt SDK on a clean CI runner."""
+"""Prepare OBS and its matching Qt SDK on a clean CI runner.
+
+OBS_VERSION and DEPS_VERSION must match: DEPS_VERSION is the obs-deps release
+that OBS_VERSION was built with (CMakePresets.json "prebuilt" version in the
+OBS source). The plugin only loads on OBS releases shipping the same Qt minor.
+"""
 import json
 import os
 from pathlib import Path
@@ -12,6 +17,8 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
 WORK = ROOT / ".deps"
+OBS_VERSION = "32.2.2"
+DEPS_VERSION = "2026-07-15"
 WORK.mkdir(exist_ok=True)
 
 
@@ -35,21 +42,21 @@ def download(url, name):
     return path
 
 
-source_archive = download("https://github.com/obsproject/obs-studio/archive/refs/tags/32.0.4.zip", "obs-source.zip")
+source_archive = download(f"https://github.com/obsproject/obs-studio/archive/refs/tags/{OBS_VERSION}.zip", "obs-source.zip")
 with zipfile.ZipFile(source_archive) as archive:
     archive.extractall(WORK)
-source = WORK / "obs-studio-32.0.4"
+source = WORK / f"obs-studio-{OBS_VERSION}"
 qt = WORK / "qt"
 qt.mkdir(exist_ok=True)
 sdk = WORK / "sdk"
 sdk.mkdir(exist_ok=True)
-deps_url = "https://github.com/obsproject/obs-deps/releases/download/2025-08-23/"
+deps_url = f"https://github.com/obsproject/obs-deps/releases/download/{DEPS_VERSION}/"
 
 if sys.platform == "win32":
-    with zipfile.ZipFile(download(deps_url + "windows-deps-qt6-2025-08-23-x64.zip", "qt.zip")) as archive:
+    with zipfile.ZipFile(download(deps_url + f"windows-deps-qt6-{DEPS_VERSION}-x64.zip", "qt.zip")) as archive:
         archive.extractall(qt)
     obs = WORK / "obs"
-    with zipfile.ZipFile(download("https://github.com/obsproject/obs-studio/releases/download/32.0.4/OBS-Studio-32.0.4-Windows-x64.zip", "obs.zip")) as archive:
+    with zipfile.ZipFile(download(f"https://github.com/obsproject/obs-studio/releases/download/{OBS_VERSION}/OBS-Studio-{OBS_VERSION}-Windows-x64.zip", "obs.zip")) as archive:
         archive.extractall(obs)
     vswhere = Path(os.environ["ProgramFiles(x86)"]) / "Microsoft Visual Studio/Installer/vswhere.exe"
     visual_studio = Path(subprocess.check_output([str(vswhere), "-latest", "-products", "*", "-requires", "Microsoft.VisualStudio.Component.VC.Tools.x86.x64", "-property", "installationPath"], text=True).strip())
@@ -65,11 +72,11 @@ if sys.platform == "win32":
 else:
     dependencies = WORK / "dependencies"
     dependencies.mkdir(exist_ok=True)
-    with tarfile.open(download(deps_url + "macos-deps-2025-08-23-arm64.tar.xz", "dependencies.tar.xz")) as archive:
+    with tarfile.open(download(deps_url + f"macos-deps-{DEPS_VERSION}-arm64.tar.xz", "dependencies.tar.xz")) as archive:
         archive.extractall(dependencies, filter="data")
-    with tarfile.open(download(deps_url + "macos-deps-qt6-2025-08-23-arm64.tar.xz", "qt.tar.xz")) as archive:
+    with tarfile.open(download(deps_url + f"macos-deps-qt6-{DEPS_VERSION}-arm64.tar.xz", "qt.tar.xz")) as archive:
         archive.extractall(qt, filter="data")
-    image = download("https://github.com/obsproject/obs-studio/releases/download/32.0.4/OBS-Studio-32.0.4-macOS-Apple.dmg", "obs-arm64.dmg")
+    image = download(f"https://github.com/obsproject/obs-studio/releases/download/{OBS_VERSION}/OBS-Studio-{OBS_VERSION}-macOS-Apple.dmg", "obs-arm64.dmg")
     mount = WORK / "mount"
     run("hdiutil", "attach", image, "-readonly", "-nobrowse", "-mountpoint", mount)
     obs = WORK / "OBS.app"

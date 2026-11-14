@@ -34,6 +34,7 @@ env["QT_QPA_PLATFORM_PLUGIN_PATH"] = str(qt / "plugins/platforms")
 if windows:
     env["PATH"] = str(obs / "bin/64bit") + os.pathsep + str(qt / "bin") + os.pathsep + env["PATH"]
     env["PLAYLISTDOCK_OBS_DATA"] = str(obs / "data/libobs")
+    env["PLAYLISTDOCK_GRAPHICS_MODULE"] = str(obs / "bin/64bit/libobs-d3d11.dll")
     executable = build / "Release/playlistdock-stress.exe"
     module, data = obs / "obs-plugins/64bit/vlc-video.dll", obs / "data/obs-plugins/vlc-video"
 else:

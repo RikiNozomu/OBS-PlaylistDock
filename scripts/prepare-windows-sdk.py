@@ -1,6 +1,6 @@
 """Prepare import libraries from an installed OBS, using only Python and MSVC.
 
-The source headers and installed binaries must both be OBS 32.0.4.
+The source headers and installed binaries must be the same OBS 32.x release.
 No OBS/Qt runtime files are copied or modified.
 """
 from pathlib import Path
@@ -47,10 +47,9 @@ def main() -> None:
     binaries = args.obs_bin.resolve(strict=True)
     output = args.out.resolve()
     config = (source / "libobs" / "obs-config.h").read_text(encoding="utf-8")
-    for name, expected in (("MAJOR", 32), ("MINOR", 0), ("PATCH", 4)):
-        match = re.search(rf"#define LIBOBS_API_{name}_VER\s+(\d+)", config)
-        if not match or int(match.group(1)) != expected:
-            raise ValueError("Source headers must be OBS 32.0.4")
+    match = re.search(r"#define LIBOBS_API_MAJOR_VER\s+(\d+)", config)
+    if not match or int(match.group(1)) != 32:
+        raise ValueError("Source headers must be OBS 32.x")
     for folder in ("include", "lib", "cmake"):
         (output / folder).mkdir(parents=True, exist_ok=True)
     (output / "include" / "obsconfig.h").write_text(
