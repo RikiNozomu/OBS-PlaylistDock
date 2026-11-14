@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(OBS-PlaylistDock VERSION 1.2.1 LANGUAGES CXX)
+project(OBS-PlaylistDock VERSION 1.2.2 LANGUAGES CXX)
 
 if((NOT WIN32 AND NOT APPLE) OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
   message(FATAL_ERROR "This release requires Windows x64 or macOS ARM64.")
