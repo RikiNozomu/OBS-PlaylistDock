@@ -384,8 +384,6 @@ void featureSuite(const QStringList &files)
         ids.append(list->item(row)->data(Qt::UserRole).toString());
     doubleClick(dock, 1);
     const QStringList playing = playlist(source);
-    int sceneRequests = 0;
-    QObject::connect(&dock, &PlaylistDock::sceneSwitchRequested, &dock, [&](const QString &) { ++sceneRequests; });
     list->setCurrentRow(0, QItemSelectionModel::ClearAndSelect);
     list->item(2)->setSelected(true);
     QMetaObject::invokeMethod(list, "customContextMenuRequested", Qt::DirectConnection,
@@ -404,7 +402,7 @@ void featureSuite(const QStringList &files)
     activate(dock, "locateCurrent");
     check(search->text().isEmpty() && list->currentRow() == 1, "locating playback clears filtering and selects the playing entry");
     check(list->hasFocus(), "locating playback returns focus to the list");
-    check(sceneRequests == 0 && playlist(source) == playing, "locating playback does not replay or switch scenes");
+    check(playlist(source) == playing, "locating playback does not replay");
     list->item(2)->setSelected(true);
     activate(dock, "remove");
     waitFor([&] { return playlist(source).isEmpty() && obs_source_media_get_state(source) == OBS_MEDIA_STATE_STOPPED; },

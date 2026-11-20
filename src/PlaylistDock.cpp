@@ -433,7 +433,7 @@ void PlaylistDock::buildUi()
         listMenu->popup(list_->viewport()->mapToGlobal(menuPosition));
     });
     connect(list_, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem *item) {
-        playTrack(item->data(IdRole).toString(), true);
+        playTrack(item->data(IdRole).toString());
     });
     for (const auto key : {Qt::Key_Return, Qt::Key_Enter}) {
         auto *shortcut = new QShortcut(QKeySequence(key), list_);
@@ -1063,7 +1063,7 @@ void PlaylistDock::openFolder()
         clearError();
 }
 
-void PlaylistDock::playTrack(const QString &id, bool switchScene)
+void PlaylistDock::playTrack(const QString &id)
 {
     OBSSourceAutoRelease source = lockSource();
     const auto it = std::find_if(tracks_.cbegin(), tracks_.cend(), [&id](const Track &track) { return track.id == id; });
@@ -1078,7 +1078,6 @@ void PlaylistDock::playTrack(const QString &id, bool switchScene)
     }
     endArmed_ = false;
     seekTarget_ = -1;
-    switchSceneOnStart_ = switchScene;
     const QString previousId = currentId_;
     currentId_ = id;
     managed_ = true;
@@ -1147,8 +1146,6 @@ void PlaylistDock::mediaStopped(void *context, calldata_t *data)
 #endif
         dock->lastCommand_.restart();
         dock->updateButtons();
-        if (dock->switchSceneOnStart_)
-            emit dock->sceneSwitchRequested(dock->wantedUuid_);
     }, Qt::QueuedConnection);
 }
 
@@ -1162,7 +1159,6 @@ void PlaylistDock::cancelSwitch()
         pendingPlayback_ = nullptr;
     }
     switching_ = false;
-    switchSceneOnStart_ = false;
     if (wasSwitching) {
         if (OBSSourceAutoRelease source = lockSource()) {
             OBSDataAutoRelease settings = obs_source_get_settings(source);
@@ -1179,7 +1175,7 @@ void PlaylistDock::playSelected()
 {
     const QString id = selectedId();
     if (!id.isEmpty())
-        playTrack(id, true);
+        playTrack(id);
 }
 
 void PlaylistDock::playRelative(int offset)

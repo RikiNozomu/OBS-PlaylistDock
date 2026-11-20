@@ -13,7 +13,6 @@ A compact VLC playlist dock for OBS Studio. Supports Windows x64 and macOS ARM64
 - Compact playback controls, click or drag seeking, elapsed/remaining time and track count at the top right.
 - Search moves to a second row when the dock is narrow.
 - Save stop-at-end, play-next or repeat mode separately for each VLC source; new sources default to stop.
-- Automatically switch to a unique matching scene on track activation; use preview in Studio Mode.
 - Restore the complete VLC playlist and original settings.
 - Theme-aware icons and no routine action notifications.
 

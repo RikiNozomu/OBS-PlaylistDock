@@ -31,7 +31,6 @@ public:
 
 signals:
     void configurationChanged();
-    void sceneSwitchRequested(const QString &sourceUuid);
 
 private:
     struct Track { QString id; QString path; qint64 bytes = -2; };
@@ -57,7 +56,7 @@ private:
     void openFolder();
     void restoreSource();
     void playSelected();
-    void playTrack(const QString &id, bool switchScene = false);
+    void playTrack(const QString &id);
     void cancelSwitch();
     static void mediaStopped(void *context, calldata_t *data);
     void playRelative(int offset);
@@ -84,7 +83,6 @@ private:
     OBSData pendingPlayback_;
     quint64 switchGeneration_ = 0;
     bool switching_ = false;
-    bool switchSceneOnStart_ = false;
     QList<Track> tracks_;
     QList<RemovedTrack> removedTracks_;
     QHash<QString, ViewState> views_;
