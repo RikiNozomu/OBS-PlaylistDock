@@ -3,7 +3,6 @@
 #include <obs-module.h>
 #include <obs-frontend-api.h>
 #include <QPointer>
-#include <QSet>
 
 // Built against OBS 32.x headers; the libobs/frontend ABI used here is unchanged in OBS 33.
 #if LIBOBS_API_MAJOR_VER < 32 || LIBOBS_API_MAJOR_VER > 33
@@ -25,61 +24,6 @@ namespace {
 constexpr const char *DockId = "OBS-PlaylistDock";
 QPointer<PlaylistDock> dock;
 bool exiting = false;
-
-bool containsSource(obs_source_t *container, obs_source_t *source, QSet<obs_source_t *> &visited)
-{
-    if (container == source)
-        return true;
-    obs_scene_t *scene = obs_group_or_scene_from_source(container);
-    if (!scene || visited.contains(container))
-        return false;
-    visited.insert(container);
-    struct Search {
-        obs_source_t *source;
-        QSet<obs_source_t *> *visited;
-        bool found = false;
-    } search{source, &visited};
-    obs_scene_enum_items(scene, [](obs_scene_t *, obs_sceneitem_t *item, void *context) {
-        auto &search = *static_cast<Search *>(context);
-        if (containsSource(obs_sceneitem_get_source(item), search.source, *search.visited))
-            search.found = true;
-        return !search.found;
-    }, &search);
-    return search.found;
-}
-
-QList<OBSSource> matchingScenes(obs_source_t *source)
-{
-    obs_frontend_source_list scenes{};
-    obs_frontend_get_scenes(&scenes);
-    QList<OBSSource> matches;
-    for (size_t i = 0; i < scenes.sources.num; ++i) {
-        QSet<obs_source_t *> visited;
-        if (!obs_source_removed(scenes.sources.array[i]) && containsSource(scenes.sources.array[i], source, visited))
-            matches.append(OBSSource(scenes.sources.array[i]));
-    }
-    obs_frontend_source_list_free(&scenes);
-    return matches;
-}
-
-void switchScene(const QString &sourceUuid)
-{
-    OBSSourceAutoRelease source = obs_get_source_by_uuid(sourceUuid.toUtf8().constData());
-    if (!source)
-        return;
-    const bool studio = obs_frontend_preview_program_mode_active();
-    OBSSourceAutoRelease current = studio ? obs_frontend_get_current_preview_scene() : obs_frontend_get_current_scene();
-    QSet<obs_source_t *> visited;
-    if (current && containsSource(current, source, visited))
-        return;
-    const auto matches = matchingScenes(source);
-    if (matches.size() != 1)
-        return;
-    if (studio)
-        obs_frontend_set_current_preview_scene(matches.front());
-    else
-        obs_frontend_set_current_scene(matches.front());
-}
 
 void frontendEvent(obs_frontend_event event, void *)
 {
@@ -124,7 +68,6 @@ bool obs_module_load()
         return false;
     }
     dock = widget;
-    QObject::connect(widget, &PlaylistDock::sceneSwitchRequested, widget, switchScene);
     QObject::connect(widget, &PlaylistDock::configurationChanged, widget, [] { obs_frontend_save(); });
     exiting = false;
     obs_frontend_add_event_callback(frontendEvent, nullptr);
